@@ -1,0 +1,17 @@
+.env
+.user-service-env
+.env
+
+# Python virtual environments
+env/
+venv/
+.venv/
+user-service-env/
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
