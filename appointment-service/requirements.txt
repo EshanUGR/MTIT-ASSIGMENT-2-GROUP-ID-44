@@ -3,3 +3,8 @@ uvicorn
 sqlalchemy
 pymysql
 python-dotenv
+cryptography
+
+
+# pydantic-settings==2.10.1
+# email-validator==2.2.0
