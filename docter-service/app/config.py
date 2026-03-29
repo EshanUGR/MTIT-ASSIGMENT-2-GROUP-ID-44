@@ -7,10 +7,10 @@ class Settings(BaseSettings):
     PORT: int = 8010
     NODE_ENV: str = "development"
     DB_HOST: str = "localhost"
-    DB_PORT: int = 3306
+    DB_PORT: int = 3307
     DB_NAME: str = "doctor_db"
     DB_USER: str = "root"
-    DB_PASSWORD: str = ""
+    DB_PASSWORD: str = "root"
 
 
 settings = Settings()
