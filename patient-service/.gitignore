@@ -1,6 +1,5 @@
-.env
 .user-service-env
-.env
+
 
 # Python virtual environments
 env/
