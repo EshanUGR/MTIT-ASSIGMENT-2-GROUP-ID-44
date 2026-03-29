@@ -15,6 +15,9 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    address: Optional[str] = None
     status: Optional[str] = None
     is_active: Optional[bool] = None
 
@@ -38,3 +41,8 @@ class LoginResponse(BaseModel):
     token_type: str
     role: str
     user: UserResponse
+
+
+class DeleteResponse(BaseModel):
+    message: str
+    id: int

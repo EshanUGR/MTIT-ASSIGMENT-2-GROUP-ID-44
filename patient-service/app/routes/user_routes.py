@@ -102,7 +102,7 @@ def deactivate_patient(
     return user
 
 
-@router.delete("/{user_id}")
+@router.delete("/{user_id}", response_model=schemas.DeleteResponse)
 def delete_patient(
     user_id: int,
     db: Session = Depends(database.get_db),
@@ -114,7 +114,7 @@ def delete_patient(
 
     db.delete(user)
     db.commit()
-    return {"message": "User deleted permanently"}
+    return {"message": "User deleted permanently", "id": user_id}
 
 
 @router.post("/login", response_model=schemas.LoginResponse)
