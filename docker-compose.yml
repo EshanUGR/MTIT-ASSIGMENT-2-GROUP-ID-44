@@ -1,0 +1,115 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mediconnect-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mediconnect_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mediconnect_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  doctor-service:
+    build:
+      context: ./docter-service
+    container_name: doctor-service
+    ports:
+      - "8010:8010"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mediconnect_db
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  patient-service:
+    build:
+      context: ./patient-service
+    container_name: patient-service
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mediconnect_db
+      DB_USER: root
+      DB_PASSWORD: root
+      JWT_SECRET_KEY: change-this-to-a-strong-random-secret
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      ADMIN_EMAILS: admin@gmail.com
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  appointment-service:
+    build:
+      context: ./appointment-service
+    container_name: appointment-service
+    ports:
+      - "8020:8020"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mediconnect_db
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8030:8030"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mediconnect_db
+      DB_USER: root
+      DB_PASSWORD: root
+      APPOINTMENT_SERVICE_URL: http://appointment-service:8020
+      PATIENT_SERVICE_URL: http://patient-service:8000
+      DOCTOR_SERVICE_URL: http://doctor-service:8010
+    depends_on:
+      mysql:
+        condition: service_healthy
+      appointment-service:
+        condition: service_started
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8050:8050"
+    environment:
+      PORT: 8050
+      PATIENT_SERVICE_URL: http://patient-service:8000
+      DOCTOR_SERVICE_URL: http://doctor-service:8010
+      APPOINTMENT_SERVICE_URL: http://appointment-service:8020
+      NOTIFICATION_SERVICE_URL: http://notification-service:8030
+      REQUEST_TIMEOUT_SECONDS: 15
+    depends_on:
+      patient-service:
+        condition: service_started
+      doctor-service:
+        condition: service_started
+      appointment-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+
+volumes:
+  mediconnect_mysql_data:

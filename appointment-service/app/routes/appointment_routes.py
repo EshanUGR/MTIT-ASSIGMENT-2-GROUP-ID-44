@@ -14,6 +14,17 @@ def create_appointment(payload: AppointmentCreate, db: Session = Depends(get_db)
     return appointment_service.create_appointment(db, payload.model_dump())
 
 
+@router.get("/by-id/{appointment_id}", response_model=AppointmentRead)
+def get_appointment_by_id(appointment_id: int, db: Session = Depends(get_db)):
+
+    appointment = appointment_service.get_appointment_by_id(db, appointment_id)
+
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+
+    return appointment
+
+
 @router.get("/{user_id}", response_model=list[AppointmentRead])
 def get_user_appointments(user_id: int, db: Session = Depends(get_db)):
 

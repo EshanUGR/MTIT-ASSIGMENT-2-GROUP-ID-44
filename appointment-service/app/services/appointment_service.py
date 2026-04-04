@@ -24,6 +24,13 @@ def get_user_appointments(db: Session, user_id: int):
     return list(db.scalars(stmt).all())
 
 
+def get_appointment_by_id(db: Session, appointment_id: int):
+
+    stmt = select(Appointment).where(Appointment.id == appointment_id)
+
+    return db.scalar(stmt)
+
+
 def delete_appointment(db: Session, appointment_id: int):
 
     stmt = select(Appointment).where(Appointment.id == appointment_id)

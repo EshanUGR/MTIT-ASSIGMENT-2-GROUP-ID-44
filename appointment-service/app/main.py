@@ -1,17 +1,20 @@
 from fastapi import FastAPI
 
-from app.database import engine
-from app.models import appointment
-from app.routes import appointment_routes
+from app.database import Base, engine
+from app.models import appointment as _appointment  # noqa: F401
+from app.routes.appointment_routes import router as appointment_router
 
-appointment.Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="Appointment Service")
-
-app.include_router(appointment_routes.router)
+app = FastAPI(title="appointment-service")
 
 
-@app.get("/")
-def root():
+@app.on_event("startup")
+def on_startup() -> None:
+    Base.metadata.create_all(bind=engine)
 
-    return {"message": "Appointment Service Running"}
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"service": "appointment-service", "status": "ok"}
+
+
+app.include_router(appointment_router)
